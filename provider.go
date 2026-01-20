@@ -54,8 +54,6 @@ func (p *Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record
 		return nil, err
 	}
 
-	DebugPrintDNSRowList(data.Row)
-
 	var records []libdns.Record
 	for _, row := range data.Row {
 		record, err := ToLibDNSRecord(row)
@@ -94,9 +92,6 @@ func (p *Provider) AppendRecords(ctx context.Context, zone string, records []lib
 		if err != nil {
 			return nil, err
 		}
-
-		DebugPrintEnvelope(*envelope)
-		DebugPrintDNSAppendResponse(data)
 
 		if envelope.Response.Code == 1000 {
 			addedRecords = append(addedRecords, record)
@@ -152,7 +147,6 @@ func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns
 
 		_, ok := remoteMap[recordToSetKey]
 		if !ok {
-			fmt.Println("Creating new record")
 			payload := wedosRecordToSet
 			request, err := p.buildRequest(ctx, AppendRecords, "AppendRecords", payload)
 			if err != nil {
@@ -173,11 +167,10 @@ func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns
 			if envelope.Response.Code == 1000 {
 				updatedRecords = append(updatedRecords, recordToSet)
 			} else {
-				fmt.Println("Error creating new record: ")
-				DebugPrintEnvelope(*envelope)
+				// todo log error
+				continue
 			}
 		} else {
-			fmt.Println("Updating record")
 			payload := map[string]string{
 				"domain": zone,
 				"row_id": remoteMap[recordToSetKey].ID,
@@ -200,7 +193,6 @@ func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns
 				return nil, err
 			}
 
-			DebugPrintEnvelope(*envelope)
 			updatedRecords = append(updatedRecords, recordToSet)
 		}
 	}
