@@ -1,29 +1,37 @@
-DEVELOPER INSTRUCTIONS:
-=======================
-
-This repo is a template for developers to use when creating new [libdns](https://github.com/libdns/libdns) provider implementations.
-
-Be sure to update:
-
-- The package name
-- The Go module name in go.mod
-- The latest `libdns/libdns` version in go.mod
-- All comments and documentation, including README below and godocs
-- License (must be compatible with Apache/MIT)
-- All "TODO:"s is in the code
-- All methods that currently do nothing
-
-**Please be sure to conform to the semantics described at the [libdns godoc](https://github.com/libdns/libdns).**
-
-_Remove this section from the readme before publishing._
-
----
-
-\<PROVIDER NAME\> for [`libdns`](https://github.com/libdns/libdns)
+WEDOS DNS for [`libdns`](https://github.com/libdns/libdns)
 =======================
 
 [![Go Reference](https://pkg.go.dev/badge/test.svg)](https://pkg.go.dev/github.com/libdns/TODO:PROVIDER_NAME)
 
-This package implements the [libdns interfaces](https://github.com/libdns/libdns) for \<PROVIDER\>, allowing you to manage DNS records.
+This package implements the [libdns interfaces](https://github.com/libdns/libdns) for WEDOS, 
+allowing you to manage DNS records.
 
-TODO: Show how to configure and use. Explain any caveats.
+# Authentication
+WEDOS API (WAPI) doesn't use API keys, but rather login username and password (precisely their SHA-1 hash). To get started,
+please see the official instructions [here](https://kb.wedos.global/wapi-manual/#activate).
+
+# Usage
+```go
+package main
+
+import (
+	"context"
+	"os"
+	"log"
+
+	"github.com/libdns/wedos"
+)
+
+func main() {
+	provider := wedos.Provider{
+		Username: os.Getenv("WEDOS_USERNAME"),
+		Password: os.Getenv("WEDOS_PASSWORD"),
+	}
+
+	records, err := provider.GetRecords(context, "example.org")
+	if err != nil {
+		log.Fatalf("Unexpected error: %s", err)
+	}
+
+	fmt.Printf("%#v", records)
+}
